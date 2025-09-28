@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n,k;
+    cin >> n >> k;
+    vector<int> a(n + 1);
+    for(int i = 1; i <= n; i++) cin >> a[i];
+
+    vector<vector<long long>> dp(n + 1, vector<long long>(k + 1, 0));
+
+    // Base case
+    for(int i = 1; i <= n; i++) dp[i][1] = 1;
+
+    // Transition
+    for(int j = 2; j <= k; j++){
+        for(int i = 1; i <= n; i++){
+            for(int t = 1; t < i; t++){
+                if(a[i] > a[t]) 
+                    dp[i][j] += dp[t][j - 1];
+            }
+        }
+    }
+
+    // Answer
+    long long ans = 0;
+    for(int i = 1; i <= n; i++) ans += dp[i][k];
+
+    cout << ans;
+}
