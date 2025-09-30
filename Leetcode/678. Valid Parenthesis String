@@ -9,6 +9,24 @@ Nếu minOpen tụt âm khi đang xử lý một ký tự *, thì ta có thể �
 Nếu minOpen tụt âm sau khi đọc ), thì để giải thích hợp lệ, ta phải hiểu rằng ít nhất một trong các * đã xuất hiện trước đó đã không được chọn là ')' như trong kịch bản bi quan, mà thay vào đó phải coi là '(' hoặc rỗng.
 👉 Nói cách khác: reset minOpen về 0 ngầm nghĩa là có ít nhất một * được chuyển sang '(' (chứ không chỉ rỗng).
                                                                                        ví dụ :(**))
+Những điểm mấu chốt bạn vừa “mở khóa”
+
+maxOpen = tình huống lạc quan nhất (mọi * là '(').
+
+Nếu ngay cả lạc quan mà vẫn âm (nhiều )) → chắc chắn fail.
+
+minOpen = tình huống bi quan nhất (mọi * là ')').
+
+Nếu nó < 0 → tức là không thể bi quan hết, phải buộc coi ít nhất một * thành '(' để bù lại.
+
+Reset về 0 chính là động tác “bỏ qua kịch bản dư ) bi quan”.
+
+Kết thúc:
+
+Nếu minOpen == 0 → tồn tại ít nhất một cách gán để chuỗi hợp lệ.
+
+Nếu minOpen > 0 → chắc chắn dư '('.
+
 bool checkValidString(string s) {
 
     int minOpen = 0, maxOpen = 0;
