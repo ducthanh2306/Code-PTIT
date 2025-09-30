@@ -1,0 +1,46 @@
+Khi minOpen xuống âm rồi mình reset về 0, tức là nói “có thể chọn một số * làm '(' hoặc rỗng để tránh âm”. Vậy cái * đó là một trong những * đã đi qua trước đó, hay là chính ký tự * đang xét?
+
+Câu trả lời chính xác
+
+👉 Nó có thể là cả hai:
+
+Nếu minOpen tụt âm khi đang xử lý một ký tự *, thì ta có thể “coi ngay chính ký tự * này” là '(' hoặc rỗng để kéo nó về lại ≥ 0.
+
+Nếu minOpen tụt âm sau khi đọc ), thì để giải thích hợp lệ, ta phải hiểu rằng ít nhất một trong các * đã xuất hiện trước đó đã không được chọn là ')' như trong kịch bản bi quan, mà thay vào đó phải coi là '(' hoặc rỗng.
+👉 Nói cách khác: reset minOpen về 0 ngầm nghĩa là có ít nhất một * được chuyển sang '(' (chứ không chỉ rỗng).
+                                                                                       ví dụ :(**))
+bool checkValidString(string s) {
+
+    int minOpen = 0, maxOpen = 0;
+
+    for (char c : s) {
+
+        if (c == '(') {            // đẩy cả cận dưới & trên lên
+
+            minOpen++; 
+
+            maxOpen++;
+
+        } else if (c == ')') {     // kéo cả hai xuống
+
+            minOpen--; 
+
+            maxOpen--;
+
+        } else { // c == '*'
+
+            minOpen--;             // coi '*' là ')'
+
+            maxOpen++;             // đồng thời có thể coi '*' là '('
+
+        }
+
+        if (maxOpen < 0) return false; // QUY TẮC #2: quá nhiều ')'
+
+        if (minOpen < 0) minOpen = 0;  // QUY TẮC #1: cận dưới không thể âm
+
+    }
+
+    return minOpen == 0; // đóng được hết mở
+
+}
