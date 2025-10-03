@@ -1,0 +1,94 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n;
+set<string> cc;
+vector<int> arr;
+vector<int> tmp;
+void bt(int i){
+    if(tmp.size() >= 2 ){
+        string s;
+        for(int i = 0 ; i <tmp.size();i++){
+            s+= to_string(tmp[i]);
+            if(i < tmp.size() - 1) s+= " ";
+        }  
+        cc.insert(s);
+    }
+    if(i == n) return;
+    if(tmp.empty()){
+        tmp.push_back(arr[i]);
+        bt(i + 1);
+        tmp.pop_back();
+        bt(i + 1);
+    }else{
+        if(tmp.back() < arr[i]){
+            tmp.push_back(arr[i]);
+            bt(i + 1);
+            tmp.pop_back();
+        }
+        bt(i + 1);
+    }
+}
+int main(){
+    cin >> n;
+    arr.resize(n);
+    for(int &x : arr) cin >> x;
+    bt(0);
+    for(string s : cc) cout << s << endl;
+}
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <set>
+
+using namespace std;
+
+int n;
+vector<int> arr;
+vector<int> tmp;
+set<string> result_set; // Dùng set để tự động sắp xếp và loại bỏ trùng lặp
+
+// Hàm quay lui với tham số `start_index` để bắt đầu duyệt
+void backtrack(int start_index) {
+    // 1. Lưu kết quả nếu dãy hiện tại hợp lệ (có từ 2 phần tử trở lên)
+    if (tmp.size() >= 2) {
+        string s;
+        for (int i = 0; i < tmp.size(); i++) {
+            s += to_string(tmp[i]);
+            if (i < tmp.size() - 1) {
+                s += " ";
+            }
+        }
+        result_set.insert(s);
+    }
+
+    // 2. Vòng lặp để thử thêm các phần tử còn lại vào dãy
+    for (int i = start_index; i < n; i++) {
+        // Điều kiện để thêm:
+        // - Dãy rỗng HOẶC
+        // - Phần tử sắp thêm (arr[i]) lớn hơn phần tử cuối cùng trong dãy (tmp.back())
+        if (tmp.empty() || arr[i] > tmp.back()) {
+            tmp.push_back(arr[i]);    // Thêm vào
+            backtrack(i + 1);         // Gọi đệ quy để xét các phần tử từ vị trí i+1
+            tmp.pop_back();           // Quay lui: xóa phần tử vừa thêm để thử nhánh khác
+        }
+    }
+}
+
+int main() {
+    cin >> n;
+    arr.resize(n);
+    for (int &x : arr) cin >> x;
+
+    // Sắp xếp mảng đầu vào để đảm bảo các dãy con tìm được luôn tăng dần
+    // và giống với kết quả của tổ hợp.
+    sort(arr.begin(), arr.end());
+
+    backtrack(0); // Bắt đầu từ chỉ số 0
+
+    for (const string& s : result_set) {
+        cout << s << endl;
+    }
+
+    return 0;
+}
