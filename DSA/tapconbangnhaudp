@@ -1,0 +1,109 @@
+Bạn nói “giải thích code” thì mình giải thích chi tiết từng ý nhé.
+(Trước hết: mình phát hiện 1 dòng trong bản mình gửi có thể gây sai — mình sửa luôn ở dưới rồi giải thích theo bản đúng.)
+
+✅ Code DP đúng (đã sửa nhẹ)
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t; 
+    if (!(cin >> t)) return 0;
+    while (t--) {
+        int n; 
+        cin >> n;
+        vector<int> a(n);
+        long long S = 0;
+        for (int &x : a) { cin >> x; S += x; }
+
+        if (S & 1LL) { cout << "NO\n"; continue; }   // tổng lẻ -> không thể chia đôi
+        long long target_ll = S / 2;
+        if (target_ll > INT_MAX) { cout << "NO\n"; continue; } // phòng kích thước quá lớn
+        int target = (int)target_ll;
+
+        // dp[s] = có thể đạt tổng s (từ một tập con các phần tử đầu đã xét) hay không
+        vector<char> dp(target + 1, 0);
+        dp[0] = 1; // tổng 0 luôn đạt được: chọn tập rỗng
+
+        for (int x : a) {
+            if (x > target) {        // phần tử lớn hơn target thì không giúp tạo tổng <= target
+                // cứ bỏ qua x, vì ta đang tìm đúng tổng target
+                continue;
+            }
+            // DUYỆT NGƯỢC để không dùng một phần tử nhiều lần
+            for (int s = target; s >= x; --s) {
+                if (dp[s - x]) dp[s] = 1;
+            }
+            if (dp[target]) break;   // cắt sớm: đã đạt đúng target thì in YES luôn
+        }
+        cout << (dp[target] ? "YES" : "NO") << '\n';
+    }
+    return 0;
+}
+
+🧠 Ý tưởng thuật toán (Subset Sum → Partition)
+
+Gọi S là tổng tất cả phần tử. Muốn chia mảng thành 2 phần có tổng bằng nhau ⇔ có 1 tập con có tổng bằng S/2 (gọi là target).
+
+Nếu S lẻ ⇒ target không nguyên ⇒ không thể → in NO.
+
+Bài toán còn lại: có tập con nào sum = target không? Đây là bài Subset Sum cổ điển.
+
+🔧 Cách hoạt động của DP
+
+dp[s] là boolean: có thể đạt tổng s hay không bằng cách chọn một số phần tử đầu đã xét.
+
+Khởi tạo: dp[0] = 1 (tổng 0 đạt được bằng tập rỗng).
+
+Khi xét phần tử x, ta cập nhật:
+
+for s từ target xuống x:
+    nếu dp[s - x] == 1  →  dp[s] = 1
+
+
+Nghĩa là: nếu trước đó có thể đạt s - x, thì bây giờ thêm x vào ta đạt s.
+
+Vì sao duyệt ngược (từ target về x)?
+
+Để không dùng lại cùng một phần tử nhiều lần.
+Nếu duyệt xuôi (từ x lên target), dp[s] vừa được set có thể lại được dùng để set tiếp dp[s + x] trong cùng vòng xét phần tử x, vô tình cho phép lấy x hơn 1 lần (sai với bài “mỗi phần tử dùng tối đa 1 lần”).
+
+✂️ Cắt sớm
+
+Nếu tại bất kỳ thời điểm nào dp[target] == 1, nghĩa là đã có tập con tổng đúng target → in YES ngay cho testcase đó.
+Điều này tiết kiệm thời gian đáng kể trên nhiều bộ dữ liệu.
+
+🧯 Vì sao bỏ qua phần tử x > target?
+
+Vì mục tiêu là đúng target. Nếu x > target, không có cách cộng thêm các số không âm để tổng vẫn bằng target khi đã lấy x (nó vượt rồi).
+
+(Giả thiết bài này là các số không âm — nếu có số âm thì phải dùng hướng khác.)
+
+⏱️ Độ phức tạp
+
+Thời gian: O(n * target) với target = S/2.
+
+Bộ nhớ: O(target).
+
+🪪 Vài dòng còn lại trong main
+
+ios::sync_with_stdio(false); cin.tie(nullptr); tăng tốc IO.
+
+Nhiều test (t testcases): mỗi testcase đọc n, mảng a, tính S, chạy DP, in YES/NO.
+
+⚠️ Ghi chú về phiên bản trước
+
+Trong bản trước mình có một dòng:
+
+if (x > target) x = target;
+
+
+Dòng này không đúng: nó có thể khiến dp[target] bị set sai (vì dp[target] sẽ lấy từ dp[0] ngay khi có phần tử nào x > target), dẫn đến trả lời YES nhầm. Phiên bản ở trên đã sửa đúng bằng cách bỏ qua x nếu x > target.
+
+Nếu bạn muốn, mình có thể thêm:
+
+Bản bitset (rất nhanh khi target không quá lớn).
+
+Bản meet-in-the-middle (khi n ~ 30–40, tổng lớn).
