@@ -1,0 +1,61 @@
+class Solution {
+public:
+    string target;
+    vector<pair<int,int>> fir;
+    bool found = false;
+
+    void pos(vector<vector<char>>& board) {
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board[i].size(); j++) {
+                if (board[i][j] == target[0]) fir.push_back({i, j});
+            }
+        }
+    }
+
+    void dfs(vector<vector<char>>& board, string& res, int x, int y, char last) {
+        // Nếu đã tìm thấy từ
+        if (found) return;
+
+        // Vượt biên
+        if (x < 0 || y < 0 || x >= board.size() || y >= board[0].size()) return;
+
+        // Ký tự không khớp ký tự tiếp theo trong target
+        if (board[x][y] != target[res.size()]) return;
+
+        // Thêm ký tự hiện tại
+        res.push_back(board[x][y]);
+
+        // Nếu khớp toàn bộ target
+        if (res == target) {
+            found = true;
+            res.pop_back(); // backtrack trước khi return
+            return;
+        }
+
+        // Đánh dấu đã thăm
+        char tmp = board[x][y];
+        board[x][y] = '#';
+
+        // Gọi 4 hướng — bạn có thể giữ hướng “N, S, E, W” nếu muốn
+        dfs(board, res, x + 1, y, 'N');
+        dfs(board, res, x - 1, y, 'S');
+        dfs(board, res, x, y + 1, 'E');
+        dfs(board, res, x, y - 1, 'W');
+
+        // Phục hồi
+        board[x][y] = tmp;
+        res.pop_back(); // Quay lui
+    }
+
+    bool exist(vector<vector<char>>& board, string word) {
+        target = word;
+        pos(board);
+
+        for (auto [i, j] : fir) {
+            string res = "";
+            dfs(board, res, i, j, 'C');
+            if (found) return true;
+        }
+        return false;
+    }
+};
